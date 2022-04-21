@@ -1,11 +1,11 @@
-package nl.bd.eindopdrachtbootcamp;
+package nl.bd.garage;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 
 @SpringBootTest
-class EindopdrachtBootcampApplicationTests {
+class GarageApplicationTests {
 	@Test
 	void contextLoads() {
 	}

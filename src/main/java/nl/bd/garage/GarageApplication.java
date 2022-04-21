@@ -1,13 +1,13 @@
-package nl.bd.eindopdrachtbootcamp;
+package nl.bd.garage;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EindopdrachtBootcampApplication {
+public class GarageApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EindopdrachtBootcampApplication.class, args);
+		SpringApplication.run(GarageApplication.class, args);
 	}
 
 }
