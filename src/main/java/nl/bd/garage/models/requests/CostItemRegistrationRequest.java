@@ -4,14 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
+import nl.bd.garage.models.enums.CostType;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RepairSetPartsRequest {
-    private List<Long> partsUsed;
-    private double otherActionsPrice;
+public class CostItemRegistrationRequest {
+    private String name;
+    private double cost;
+    private CostType costType;
 }

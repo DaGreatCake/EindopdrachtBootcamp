@@ -1,5 +1,6 @@
 package nl.bd.garage.services;
 
+import nl.bd.garage.models.entities.Customer;
 import nl.bd.garage.models.entities.Repair;
 import nl.bd.garage.models.enums.RepairStatus;
 import nl.bd.garage.models.exceptions.CustomerNotFoundException;
@@ -25,8 +26,13 @@ public class RepairService {
         return repairRepository.findAll();
     }
 
-    public Repair getRepairById(long id) {
-        return repairRepository.findById(id).orElseThrow(() -> new RepairNotFoundException(id));
+    public Repair getRepairById(long repairId) {
+        return repairRepository.findById(repairId).orElseThrow(() -> new RepairNotFoundException(repairId));
+    }
+
+    public List<Customer> getCustomersToCall() {
+        List<Long> toCallIds = repairRepository.findCustomerIdsToCall();
+        return customerRepository.findCustomersByIdList(toCallIds);
     }
 
     public Repair createRepair(RepairRegistrationRequest repairRegistrationRequest) {
@@ -86,11 +92,11 @@ public class RepairService {
                 .orElseThrow(() -> new RepairNotFoundException(repairId));
     }
 
-    public void deleteRepair(Long id) {
-        if (repairRepository.findById(id).isPresent()) {
-            repairRepository.deleteById(id);
+    public void deleteRepair(Long repairId) {
+        if (repairRepository.findById(repairId).isPresent()) {
+            repairRepository.deleteById(repairId);
         } else {
-            throw new RepairNotFoundException(id);
+            throw new RepairNotFoundException(repairId);
         }
     }
 }

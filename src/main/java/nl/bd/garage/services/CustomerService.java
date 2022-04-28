@@ -17,8 +17,8 @@ public class CustomerService {
         return customerRepository.findAll();
     }
 
-    public Customer getCustomerById(long id) {
-        return customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException(id));
+    public Customer getCustomerById(long customerId) {
+        return customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException(customerId));
     }
 
     public Customer createCustomer(Customer newCustomer) {
@@ -36,11 +36,11 @@ public class CustomerService {
                 .orElseThrow(() -> new CustomerNotFoundException(customerId));
     }
 
-    public void deleteCustomer(Long id) {
-        if (customerRepository.findById(id).isPresent()) {
-            customerRepository.deleteById(id);
+    public void deleteCustomer(Long customerId) {
+        if (customerRepository.findById(customerId).isPresent()) {
+            customerRepository.deleteById(customerId);
         } else {
-            throw new CustomerNotFoundException(id);
+            throw new CustomerNotFoundException(customerId);
         }
     }
 }

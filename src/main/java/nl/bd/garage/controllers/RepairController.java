@@ -1,5 +1,6 @@
 package nl.bd.garage.controllers;
 
+import nl.bd.garage.models.entities.Customer;
 import nl.bd.garage.models.entities.Repair;
 import nl.bd.garage.models.enums.RepairStatus;
 import nl.bd.garage.models.requests.RepairRegistrationRequest;
@@ -24,6 +25,11 @@ public class RepairController {
     @GetMapping("/{repairId}")
     Repair getRepairById(@PathVariable long repairId) {
         return repairService.getRepairById(repairId);
+    }
+
+    @GetMapping("/completed")
+    List<Customer> getCustomersToCall() {
+        return repairService.getCustomersToCall();
     }
 
     // Initial creation of a repair, asks for customerId and inspection date.
@@ -51,13 +57,13 @@ public class RepairController {
     }
 
     // After a repair has been completed, this will be logged in the database.
-    @PutMapping("/repaircompleted/{repairId}")
+    @PutMapping("/setrepaircompleted/{repairId}")
     Repair setComplete(@PathVariable long repairId) {
         return repairService.setComplete(repairId);
     }
 
     // Àfter the customer has paid, this will be logged in the database.
-    @PutMapping("/paymentcompleted/{repairId}")
+    @PutMapping("/setpaymentcompleted/{repairId}")
     Repair setPaymentComplete(@PathVariable long repairId) {
         return repairService.setPaymentComplete(repairId);
     }

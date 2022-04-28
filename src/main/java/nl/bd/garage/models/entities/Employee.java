@@ -25,5 +25,8 @@ public class Employee {
     @Column
     private JobFunction jobFunction;
 
-
+    public Employee(String name, JobFunction jobFunction) {
+        this.name = name;
+        this.jobFunction = jobFunction;
+    }
 }
