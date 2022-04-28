@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import nl.bd.garage.models.enums.RepairStatus;
 
 import javax.persistence.*;
 
@@ -43,7 +44,7 @@ public class Repair {
     private double otherActionsPrice;
 
     @Column
-    private Boolean completed;
+    private RepairStatus completed;
 
     @Column
     private Boolean called;
@@ -54,8 +55,8 @@ public class Repair {
     public Repair(Customer customer, java.sql.Date examinationDate) {
         this.customer = customer;
         this.examinationDate = examinationDate;
-        this.customerAgreed = false;
-        this.completed = false;
+        this.customerAgreed = null;
+        this.completed = RepairStatus.UNCOMPLETED;
         this.called = false;
         this.paid = false;
     }

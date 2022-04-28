@@ -1,9 +1,11 @@
 package nl.bd.garage.services;
 
-import nl.bd.garage.models.entities.Customer;
 import nl.bd.garage.models.entities.Repair;
+import nl.bd.garage.models.enums.RepairStatus;
+import nl.bd.garage.models.exceptions.CustomerNotFoundException;
+import nl.bd.garage.models.exceptions.RepairNotFoundException;
 import nl.bd.garage.models.requests.RepairRegistrationRequest;
-import nl.bd.garage.models.requests.RepairUpdateRequest;
+import nl.bd.garage.models.requests.RepairSetPartsRequest;
 import nl.bd.garage.repositories.CustomerRepository;
 import nl.bd.garage.repositories.RepairRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ public class RepairService {
     }
 
     public Repair getRepairById(long id) {
-        return repairRepository.getById(id);
+        return repairRepository.findById(id).orElseThrow(() -> new RepairNotFoundException(id));
     }
 
     public Repair createRepair(RepairRegistrationRequest repairRegistrationRequest) {
@@ -32,47 +34,63 @@ public class RepairService {
             Repair newRepair = new Repair(customerRepository.findById(repairRegistrationRequest.getCustomerId()).get(),
                     repairRegistrationRequest.getDate());
             return repairRepository.save(newRepair);
+        } else {
+            throw new CustomerNotFoundException(repairRegistrationRequest.getCustomerId());
         }
-
-        return null;
     }
 
-    public Repair updateRepair(RepairUpdateRequest repairUpdateRequest, Long repairId) {
+    public Repair setFoundProblems(String foundProblems, Long repairId) {
         return repairRepository.findById(repairId)
                 .map(repair -> {
-                    if(repairUpdateRequest.getExaminationDate() != null) {
-                        repair.setExaminationDate(repairUpdateRequest.getExaminationDate());
-                    }
-                    if(repairUpdateRequest.getFoundProblems() != null) {
-                        repair.setFoundProblems(repairUpdateRequest.getFoundProblems());
-                    }
-                    if(repairUpdateRequest.getRepairDate() != null) {
-                        repair.setRepairDate(repairUpdateRequest.getRepairDate());
-                    }
-                    if(repairUpdateRequest.getCustomerAgreed() != null) {
-                        repair.setCustomerAgreed(repairUpdateRequest.getCustomerAgreed());
-                    }
-                    if(repairUpdateRequest.getPartsUsed() != null) {
-                        repair.setPartsUsed(repairUpdateRequest.getPartsUsed());
-                    }
-                    if(repairUpdateRequest.getOtherActionsPrice() != 0.0) {
-                        repair.setOtherActionsPrice(repairUpdateRequest.getOtherActionsPrice());
-                    }
-                    if(repairUpdateRequest.getCompleted() != null) {
-                        repair.setCompleted(repairUpdateRequest.getCompleted());
-                    }
-                    if(repairUpdateRequest.getPaid() != null) {
-                        repair.setPaid(repairUpdateRequest.getPaid());
-                    }
-
+                    repair.setFoundProblems(foundProblems);
                     return repairRepository.save(repair);
                 })
-                .orElseGet(() -> {
-                    return null;
-                });
+                .orElseThrow(() -> new RepairNotFoundException(repairId));
+    }
+
+    public Repair setRepairDate(java.sql.Date repairDate, Long repairId) {
+        return repairRepository.findById(repairId)
+                .map(repair -> {
+                    repair.setCustomerAgreed(true);
+                    repair.setRepairDate(repairDate);
+                    return repairRepository.save(repair);
+                })
+                .orElseThrow(() -> new RepairNotFoundException(repairId));
+    }
+
+    public Repair setParts(RepairSetPartsRequest repairSetPartsRequest, Long repairId) {
+        return repairRepository.findById(repairId)
+                .map(repair -> {
+                    repair.setPartsUsed(repairSetPartsRequest.getPartsUsed());
+                    repair.setOtherActionsPrice(repairSetPartsRequest.getOtherActionsPrice());
+                    return repairRepository.save(repair);
+                })
+                .orElseThrow(() -> new RepairNotFoundException(repairId));
+    }
+
+    public Repair setComplete(Long repairId) {
+        return repairRepository.findById(repairId)
+                .map(repair -> {
+                    repair.setCompleted(RepairStatus.COMPLETED);
+                    return repairRepository.save(repair);
+                })
+                .orElseThrow(() -> new RepairNotFoundException(repairId));
+    }
+
+    public Repair setPaymentComplete(Long repairId) {
+        return repairRepository.findById(repairId)
+                .map(repair -> {
+                    repair.setPaid(true);
+                    return repairRepository.save(repair);
+                })
+                .orElseThrow(() -> new RepairNotFoundException(repairId));
     }
 
     public void deleteRepair(Long id) {
-        repairRepository.deleteById(id);
+        if (repairRepository.findById(id).isPresent()) {
+            repairRepository.deleteById(id);
+        } else {
+            throw new RepairNotFoundException(id);
+        }
     }
 }

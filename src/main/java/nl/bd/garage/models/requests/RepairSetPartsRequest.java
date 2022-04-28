@@ -9,13 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RepairUpdateRequest {
-    private java.sql.Date examinationDate;
-    private String foundProblems;
-    private java.sql.Date repairDate;
-    private Boolean customerAgreed;
+public class RepairSetPartsRequest {
     private String partsUsed;
     private double otherActionsPrice;
-    private Boolean completed;
-    private Boolean paid;
 }
