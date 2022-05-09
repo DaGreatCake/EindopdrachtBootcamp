@@ -1,6 +1,5 @@
 package nl.bd.garage.repositories;
 
-import nl.bd.garage.models.entities.CostItem;
 import nl.bd.garage.models.entities.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

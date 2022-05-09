@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import nl.bd.garage.models.enums.JobFunction;
+import nl.bd.garage.models.enums.Role;
 
 import javax.persistence.*;
 
@@ -19,14 +19,22 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeId;
 
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column
+    private String password;
+
     @Column
     private String name;
 
     @Column
-    private JobFunction jobFunction;
+    private Role role;
 
-    public Employee(String name, JobFunction jobFunction) {
+    public Employee(String username, String password, String name, Role role) {
+        this.username = username;
+        this.password = password;
         this.name = name;
-        this.jobFunction = jobFunction;
+        this.role = role;
     }
 }

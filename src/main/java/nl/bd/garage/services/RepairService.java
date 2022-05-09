@@ -3,10 +3,12 @@ package nl.bd.garage.services;
 import nl.bd.garage.models.entities.Customer;
 import nl.bd.garage.models.entities.Repair;
 import nl.bd.garage.models.enums.RepairStatus;
+import nl.bd.garage.models.exceptions.CostItemNotFoundException;
 import nl.bd.garage.models.exceptions.CustomerNotFoundException;
 import nl.bd.garage.models.exceptions.RepairNotFoundException;
 import nl.bd.garage.models.requests.RepairRegistrationRequest;
 import nl.bd.garage.models.requests.RepairSetPartsRequest;
+import nl.bd.garage.repositories.CostItemRepository;
 import nl.bd.garage.repositories.CustomerRepository;
 import nl.bd.garage.repositories.RepairRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ public class RepairService {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private CostItemRepository costItemRepository;
 
     public List<Repair> getAllRepairs() {
         return repairRepository.findAll();
@@ -54,6 +59,16 @@ public class RepairService {
                 .orElseThrow(() -> new RepairNotFoundException(repairId));
     }
 
+    public Repair setCanceled(Long repairId) {
+        return repairRepository.findById(repairId)
+                .map(repair -> {
+                    repair.setCustomerAgreed(false);
+                    repair.setCompleted(RepairStatus.CANCELED);
+                    return repairRepository.save(repair);
+                })
+                .orElseThrow(() -> new RepairNotFoundException(repairId));
+    }
+
     public Repair setRepairDate(java.sql.Date repairDate, Long repairId) {
         return repairRepository.findById(repairId)
                 .map(repair -> {
@@ -65,6 +80,13 @@ public class RepairService {
     }
 
     public Repair setParts(RepairSetPartsRequest repairSetPartsRequest, Long repairId) {
+        List<Long> partsList = repairSetPartsRequest.getPartsUsed();
+        for (Long l : partsList) {
+            if (costItemRepository.findById(l).isEmpty()) {
+                throw new CostItemNotFoundException(l);
+            }
+        }
+
         return repairRepository.findById(repairId)
                 .map(repair -> {
                     repair.setPartsUsed(repairSetPartsRequest.getPartsUsed());
