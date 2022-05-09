@@ -14,8 +14,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 
 import javax.servlet.http.HttpServletResponse;
 
-// source: https://github.com/ahmetbozok/spring-security-authentication-token-example
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
@@ -32,6 +30,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .httpBasic()
                 .authenticationEntryPoint(unauthorizedEntryPoint());
+
+        http.csrf().disable();
     }
 
     @Bean

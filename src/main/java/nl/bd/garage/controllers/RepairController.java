@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/repairs")
+@RequestMapping("/api/repairs")
 public class RepairController {
     @Autowired
     private RepairService repairService;

@@ -3,7 +3,7 @@ package nl.bd.garage.models.enums;
 import org.springframework.security.core.GrantedAuthority;
 
 public enum Role implements GrantedAuthority {
-    ASSISTANT(Code.ASSISTANT),
+    ASSISTANT(Code.ASSISTANT)   ,
     MECHANIC(Code.MECHANIC),
     CASHIER(Code.CASHIER),
     BACKOFFICE(Code.BACKOFFICE),
