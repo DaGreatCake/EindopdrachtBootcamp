@@ -76,6 +76,20 @@ public class RepairController {
         return repairService.setComplete(repairId);
     }
 
+    // After a customer has been called to retrieve their car, this will be logged so they wont be called again.
+    @Secured({Role.Code.ASSISTANT, Role.Code.ADMIN})
+    @PutMapping("/setcalled/{repairId}")
+    Repair setCalled(@PathVariable long repairId) {
+        return repairService.setCalled(repairId);
+    }
+
+    // When the customer comes to retrieve the car, a receipt can be generated.
+    @Secured({Role.Code.CASHIER, Role.Code.ADMIN})
+    @GetMapping("/receipt/{repairId}")
+    String getReceipt(@PathVariable long repairId) {
+        return repairService.getReceipt(repairId);
+    }
+
     // Àfter the customer has paid, this will be logged in the database.
     @Secured({Role.Code.CASHIER, Role.Code.ADMIN})
     @PutMapping("/setpaymentcompleted/{repairId}")

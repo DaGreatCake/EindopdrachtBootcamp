@@ -23,23 +23,18 @@ public class CostItemService {
         return costItemRepository.findById(costItemId).orElseThrow(() -> new CostItemNotFoundException(costItemId));
     }
 
-    public List<CostItem> getCostItemByIdList(List<Long> costItemIdList) {
-        return costItemRepository.findCostItemsByIdList(costItemIdList);
-    }
-
     public CostItem createCostItem(CostItemRegistrationRequest costItemRegistrationRequest) {
         CostItem costItem = new CostItem(costItemRegistrationRequest.getName(), costItemRegistrationRequest.getCost(),
                 costItemRegistrationRequest.getCostType());
         return costItemRepository.save(costItem);
     }
 
-    public CostItem updateCostItem(CostItem newCostItem, long costItemId) {
+    public CostItem updateCostItem(CostItemRegistrationRequest newCostItem, long costItemId) {
         return costItemRepository.findById(costItemId)
                 .map(costItem -> {
                     costItem.setName(newCostItem.getName());
                     costItem.setCost(newCostItem.getCost());
                     costItem.setCostType(newCostItem.getCostType());
-                    costItem.setStock(newCostItem.getStock());
 
                     if (costItem.getCostType() == CostType.ACTION) {
                         costItem.setStock(-1);

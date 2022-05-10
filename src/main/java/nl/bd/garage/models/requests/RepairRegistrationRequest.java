@@ -11,5 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RepairRegistrationRequest {
     private long customerId;
-    private java.sql.Date date;
+    private java.sql.Date examinationDate;
 }

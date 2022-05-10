@@ -34,8 +34,9 @@ public class CostItemController {
 
     @Secured({Role.Code.BACKOFFICE, Role.Code.ADMIN})
     @PutMapping("/{costItemId}")
-    CostItem updateCostItem(@RequestBody CostItem costItem, @PathVariable long costItemId) {
-        return costItemService.updateCostItem(costItem, costItemId);
+    CostItem updateCostItem(@RequestBody CostItemRegistrationRequest costItemRegistrationRequest,
+                            @PathVariable long costItemId) {
+        return costItemService.updateCostItem(costItemRegistrationRequest, costItemId);
     }
 
     @Secured({Role.Code.BACKOFFICE, Role.Code.ADMIN})
