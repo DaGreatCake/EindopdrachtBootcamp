@@ -27,6 +27,13 @@ public class Repair {
             referencedColumnName = "customerId")
     private Customer customer;
 
+    @OneToOne
+    @JoinColumn(
+            name = "fileId",
+            referencedColumnName = "fileId"
+    )
+    private File file;
+
     @Column
     private java.sql.Date examinationDate;
 

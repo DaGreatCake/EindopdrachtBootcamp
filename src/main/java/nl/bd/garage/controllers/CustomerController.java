@@ -2,10 +2,12 @@ package nl.bd.garage.controllers;
 
 import nl.bd.garage.models.entities.Customer;
 import nl.bd.garage.models.enums.Role;
+import nl.bd.garage.models.requests.CustomerNameRequest;
 import nl.bd.garage.repositories.CustomerRepository;
 import nl.bd.garage.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +26,11 @@ public class CustomerController {
     @GetMapping("/{customerId}")
     Customer getCustomerById(@PathVariable long customerId) {
         return customerService.getCustomerById(customerId);
+    }
+
+    @GetMapping("/name")
+    List<Customer> getCustomersByName(@RequestBody CustomerNameRequest customerNameRequest) {
+        return customerService.getCustomersByName(customerNameRequest);
     }
 
     @Secured({Role.Code.ASSISTANT, Role.Code.ADMIN})

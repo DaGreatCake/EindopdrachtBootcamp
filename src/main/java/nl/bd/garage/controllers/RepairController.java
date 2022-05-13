@@ -7,9 +7,15 @@ import nl.bd.garage.models.requests.RepairRegistrationRequest;
 import nl.bd.garage.models.requests.RepairSetPartsRequest;
 import nl.bd.garage.services.RepairService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -34,11 +40,23 @@ public class RepairController {
         return repairService.getCustomersToCall();
     }
 
+    @GetMapping(path = "/papers/{repairId}")
+    ResponseEntity<Resource> downloadFile(@PathVariable long repairId) throws FileNotFoundException {
+        return repairService.downloadFile(repairId);
+    }
+
     // Initial creation of a repair, asks for customerId and inspection date.
     @Secured({Role.Code.ASSISTANT, Role.Code.ADMIN})
     @PostMapping()
     Repair createRepair(@RequestBody RepairRegistrationRequest repairRegistrationRequest) {
         return repairService.createRepair(repairRegistrationRequest);
+    }
+
+    // After the creation of the repair, an optional file can be uploaded of the cars papers.
+    @Secured({Role.Code.ASSISTANT, Role.Code.ADMIN})
+    @PutMapping(path = "/papers/{repairId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    Repair uploadFile(@RequestPart(required = false) MultipartFile multipartFile, @PathVariable long repairId) {
+        return repairService.uploadFile(multipartFile, repairId);
     }
 
     // After inspection the found problems will be entered

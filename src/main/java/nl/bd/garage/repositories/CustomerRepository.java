@@ -10,6 +10,9 @@ import java.util.List;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
+    @Query(value = "SELECT * FROM customers WHERE name LIKE %:name", nativeQuery = true)
+    List<Customer> findCustomersByName(@Param("name")String name);
+
     @Query(value = "SELECT * FROM customers WHERE customer_id IN :ids", nativeQuery = true)
     List<Customer> findCustomersByIdList(@Param("ids")List<Long> ids);
 }

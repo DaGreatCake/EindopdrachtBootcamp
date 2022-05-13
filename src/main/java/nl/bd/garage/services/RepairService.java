@@ -2,6 +2,7 @@ package nl.bd.garage.services;
 
 import nl.bd.garage.models.entities.CostItem;
 import nl.bd.garage.models.entities.Customer;
+import nl.bd.garage.models.entities.File;
 import nl.bd.garage.models.entities.Repair;
 import nl.bd.garage.models.enums.CostType;
 import nl.bd.garage.models.enums.RepairStatus;
@@ -10,10 +11,21 @@ import nl.bd.garage.models.requests.RepairRegistrationRequest;
 import nl.bd.garage.models.requests.RepairSetPartsRequest;
 import nl.bd.garage.repositories.CostItemRepository;
 import nl.bd.garage.repositories.CustomerRepository;
+import nl.bd.garage.repositories.FileRepository;
 import nl.bd.garage.repositories.RepairRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 @Service
@@ -27,6 +39,9 @@ public class RepairService {
     @Autowired
     private CostItemRepository costItemRepository;
 
+    @Autowired
+    private FileRepository fileRepository;
+
     public List<Repair> getAllRepairs() {
         return repairRepository.findAll();
     }
@@ -38,6 +53,33 @@ public class RepairService {
     public List<Customer> getCustomersToCall() {
         List<Long> toCallIds = repairRepository.findCustomerIdsToCall();
         return customerRepository.findCustomersByIdList(toCallIds);
+    }
+
+    public ResponseEntity<Resource> downloadFile(long repairId) throws java.io.FileNotFoundException {
+        if (repairRepository.findById(repairId).orElseThrow(() -> new RepairNotFoundException(repairId))
+                .getFile() != null) {
+            File dbFile = repairRepository.findById(repairId).get().getFile();
+
+            java.io.File file = new java.io.File(dbFile.getName());
+            try {
+                OutputStream os = new FileOutputStream(file);
+                os.write(dbFile.getContent());
+                os.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attatchment; filename="+file.getName());
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(file.length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        } else {
+            throw new FileNotFoundException(repairId);
+        }
     }
 
     public Repair createRepair(RepairRegistrationRequest repairRegistrationRequest) {
@@ -53,6 +95,26 @@ public class RepairService {
         } else {
             throw new CustomerNotFoundException(repairRegistrationRequest.getCustomerId());
         }
+    }
+
+    public Repair uploadFile(MultipartFile multipartFile, Long repairId){
+        return repairRepository.findById(repairId)
+                .map(repair -> {
+                    if (fileRepository.findById(repair.getFile().getFileId()).isPresent()) {
+                        fileRepository.deleteById(repair.getFile().getFileId());
+                    }
+
+                    try {
+                        File file = new File(multipartFile.getBytes(), multipartFile.getOriginalFilename());
+                        fileRepository.save(file);
+                        repair.setFile(file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    return repairRepository.save(repair);
+                })
+                .orElseThrow(() -> new RepairNotFoundException(repairId)); 
     }
 
     public Repair setFoundProblems(String foundProblems, Long repairId) {
