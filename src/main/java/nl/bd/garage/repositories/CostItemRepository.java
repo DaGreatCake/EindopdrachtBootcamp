@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface CostItemRepository extends JpaRepository<CostItem, Long> {
+    // Returns all cost items from a list of cost item ids.
     @Query(value = "SELECT * FROM costitems WHERE cost_item_id IN :ids", nativeQuery = true)
     List<CostItem> findCostItemsByIdList(@Param("ids")List<Long> ids);
 }

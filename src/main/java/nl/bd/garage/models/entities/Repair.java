@@ -70,6 +70,7 @@ public class Repair {
         this.paid = false;
     }
 
+    // partsUsed is stored as a string so it can be stored in one row of a database table.
     public void setPartsUsed(List<Long> partsList) {
         String parts = "";
 

@@ -2,6 +2,7 @@ package nl.bd.garage.models.enums;
 
 import org.springframework.security.core.GrantedAuthority;
 
+// This enum will represent the authority a user has.
 public enum Role implements GrantedAuthority {
     ASSISTANT(Code.ASSISTANT),
     MECHANIC(Code.MECHANIC),

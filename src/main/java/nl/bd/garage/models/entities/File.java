@@ -17,7 +17,7 @@ import javax.persistence.*;
 public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long fileId;
+    private Long fileId;
 
     @JsonIgnore
     @OneToOne(mappedBy = "file")

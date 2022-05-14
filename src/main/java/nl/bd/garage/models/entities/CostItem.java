@@ -8,6 +8,10 @@ import nl.bd.garage.models.enums.CostType;
 
 import javax.persistence.*;
 
+/*
+ * Parts and actions are combined into CostItems so they can be stored in the same table.
+ * Then only a list of ids need to be provided to get the price.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

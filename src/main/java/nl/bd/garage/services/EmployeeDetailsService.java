@@ -9,6 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+/*
+ * Handles the details of an employee during login.
+ */
 @Service
 public class EmployeeDetailsService implements UserDetailsService {
     @Autowired

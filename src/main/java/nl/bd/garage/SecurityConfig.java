@@ -23,6 +23,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsService());
     }
 
+    // Since there are not client accounts, any request through the application must be authenticated.
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()

@@ -10,10 +10,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
-    @ExceptionHandler(value = {CostItemNotFoundException.class, CustomerDisagreedException.class,
-            CustomerDisagreedException.class, CustomerNotFoundException.class, EmployeeNotFoundException.class,
-            FileNotFoundException.class, IncorrectSyntaxException.class, ModifyAdminException.class,
-            PreviousStepUncompletedException.class, RepairNotFoundException.class})
+    @ExceptionHandler(value = {AddStockToActionException.class, CostItemNotFoundException.class,
+            CustomerDisagreedException.class, CustomerDisagreedException.class, CustomerNotFoundException.class,
+            EmployeeNotFoundException.class, FileNotFoundException.class, IncorrectSyntaxException.class,
+            ModifyAdminException.class, PartOutOfStockException.class, PreviousStepUncompletedException.class,
+            RepairNotFoundException.class})
     public ResponseEntity<Object> handlePublicException(Exception ex, WebRequest request) {
         return new ResponseEntity<>(ex.getLocalizedMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
