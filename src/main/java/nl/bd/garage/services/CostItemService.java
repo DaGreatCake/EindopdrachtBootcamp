@@ -9,6 +9,7 @@ import nl.bd.garage.repositories.CostItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 /*
@@ -22,7 +23,9 @@ public class CostItemService {
 
     // Returns all cost items.
     public List<CostItem> getAllCostItems() {
-        return costItemRepository.findAll();
+        List<CostItem> costItems = costItemRepository.findAll();
+        Collections.sort(costItems);
+        return costItems;
     }
 
     /*
@@ -50,9 +53,15 @@ public class CostItemService {
     public CostItem updateCostItem(CostItemRegistrationRequest newCostItem, Long costItemId) {
         return costItemRepository.findById(costItemId)
                 .map(costItem -> {
-                    costItem.setName(newCostItem.getName());
-                    costItem.setCost(newCostItem.getCost());
-                    costItem.setCostType(newCostItem.getCostType());
+                    if (newCostItem.getName() != null) {
+                        costItem.setName(newCostItem.getName());
+                    }
+                    if (newCostItem.getCost() != 0) {
+                        costItem.setCost(newCostItem.getCost());
+                    }
+                    if (newCostItem.getCostType() != null) {
+                        costItem.setCostType(newCostItem.getCostType());
+                    }
 
                     if (costItem.getCostType() == CostType.ACTION) {
                         costItem.setStock(-1);

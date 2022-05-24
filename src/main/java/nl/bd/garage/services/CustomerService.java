@@ -2,7 +2,6 @@ package nl.bd.garage.services;
 
 import nl.bd.garage.models.entities.Customer;
 import nl.bd.garage.models.exceptions.CustomerNotFoundException;
-import nl.bd.garage.models.requests.CustomerNameRequest;
 import nl.bd.garage.repositories.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,9 +49,16 @@ public class CustomerService {
     public Customer updateCustomer(Customer newCustomer, Long customerId) {
         return customerRepository.findById(customerId)
                 .map(customer -> {
-                    customer.setName(newCustomer.getName());
-                    customer.setLicensePlate(newCustomer.getLicensePlate());
-                    customer.setTelephoneNumber(newCustomer.getTelephoneNumber());
+                    if (newCustomer.getName() != null) {
+                        customer.setName(newCustomer.getName());
+                    }
+                    if (newCustomer.getLicensePlate() != null) {
+                        customer.setLicensePlate(newCustomer.getLicensePlate());
+                    }
+                    if (newCustomer.getTelephoneNumber() != null) {
+                        customer.setTelephoneNumber(newCustomer.getTelephoneNumber());
+                    }
+
                     return customerRepository.save(customer);
                 })
                 .orElseThrow(() -> new CustomerNotFoundException(customerId));

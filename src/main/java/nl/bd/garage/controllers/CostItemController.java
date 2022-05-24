@@ -2,6 +2,7 @@ package nl.bd.garage.controllers;
 
 import nl.bd.garage.models.entities.CostItem;
 import nl.bd.garage.models.enums.Role;
+import nl.bd.garage.models.requests.AddStockRequest;
 import nl.bd.garage.models.requests.CostItemRegistrationRequest;
 import nl.bd.garage.services.CostItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +68,8 @@ public class CostItemController {
      */
     @Secured(Role.Code.BACKOFFICE)
     @PutMapping("/addstock/{costItemId}")
-    CostItem addStock(@RequestBody int amount, @PathVariable long costItemId) {
-        return costItemService.addStock(amount, costItemId);
+    CostItem addStock(@RequestBody AddStockRequest addStockRequest, @PathVariable long costItemId) {
+        return costItemService.addStock(addStockRequest.getAmount(), costItemId);
     }
 
     /*

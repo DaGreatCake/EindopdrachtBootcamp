@@ -2,6 +2,7 @@ package nl.bd.garage.controllers;
 
 import nl.bd.garage.models.entities.Employee;
 import nl.bd.garage.models.enums.Role;
+import nl.bd.garage.models.requests.NameRequest;
 import nl.bd.garage.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -34,6 +35,16 @@ public class EmployeeController {
     @GetMapping("/{employeeId}")
     Employee getEmployeeById(@PathVariable long employeeId) {
         return employeeService.getEmployeeById(employeeId);
+    }
+
+    /*
+     * Returns a list of employees by name. Can search by last name.
+     *
+     * Provide name:String in the body.
+     */
+    @GetMapping("/name")
+    List<Employee> getEmployeesByName(@RequestBody NameRequest name) {
+        return employeeService.getEmployeesByName(name.getName());
     }
 
     /*

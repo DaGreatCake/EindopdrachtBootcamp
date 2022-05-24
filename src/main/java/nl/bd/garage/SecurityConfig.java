@@ -29,6 +29,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .anyRequest().authenticated()
                 .and()
+                .formLogin()
+                .and()
                 .httpBasic()
                 .authenticationEntryPoint(unauthorizedEntryPoint());
 

@@ -18,7 +18,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Table(name = "costitems")
-public class CostItem {
+public class CostItem implements Comparable<CostItem> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long costItemId;
@@ -44,6 +44,23 @@ public class CostItem {
             this.stock = 0;
         } else {
             this.stock = -1;
+        }
+    }
+
+    @Override
+    public int compareTo(CostItem other) {
+        if (this.getCostType() == CostType.PART && other.getCostType() == CostType.ACTION) {
+            return -1;
+        } else if (this.getCostType() == CostType.ACTION && other.getCostType() == CostType.PART) {
+            return 1;
+        } else {
+            if (this.getName().compareTo(other.getName()) < 0) {
+                return -1;
+            } else if (this.getName().compareTo(other.getName()) > 0) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
     }
 }

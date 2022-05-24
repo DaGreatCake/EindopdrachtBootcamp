@@ -2,7 +2,7 @@ package nl.bd.garage.controllers;
 
 import nl.bd.garage.models.entities.Customer;
 import nl.bd.garage.models.enums.Role;
-import nl.bd.garage.models.requests.CustomerNameRequest;
+import nl.bd.garage.models.requests.NameRequest;
 import nl.bd.garage.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -41,7 +41,7 @@ public class CustomerController {
      * Provide name:String in the body.
      */
     @GetMapping("/name")
-    List<Customer> getCustomersByName(@RequestBody CustomerNameRequest name) {
+    List<Customer> getCustomersByName(@RequestBody NameRequest name) {
         return customerService.getCustomersByName(name.getName());
     }
 

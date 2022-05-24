@@ -22,7 +22,7 @@ public class Customer {
     private Long customerId;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private Set<Repair> repairs = new HashSet<>();
 
     @Column

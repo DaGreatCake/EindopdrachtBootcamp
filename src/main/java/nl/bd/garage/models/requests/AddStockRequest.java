@@ -7,8 +7,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class CustomerNameRequest {
-    private String name;
+@AllArgsConstructor
+public class AddStockRequest {
+    private int amount;
 }

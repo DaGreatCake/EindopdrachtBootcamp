@@ -20,7 +20,7 @@ public class File {
     private Long fileId;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "file")
+    @OneToOne(mappedBy = "file", orphanRemoval = true)
     private Repair repair;
 
     @Lob

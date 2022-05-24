@@ -72,17 +72,19 @@ public class Repair {
 
     // partsUsed is stored as a string so it can be stored in one row of a database table.
     public void setPartsUsed(List<Long> partsList) {
-        String parts = "";
+        if (partsList != null) {
+            String parts = "";
 
-        for (int i = 0; i < partsList.size(); i++) {
-            parts += partsList.get(i);
+            for (int i = 0; i < partsList.size(); i++) {
+                parts += partsList.get(i);
 
-            if (i != partsList.size() - 1) {
-                parts += ",";
+                if (i != partsList.size() - 1) {
+                    parts += ",";
+                }
             }
-        }
 
-        this.partsUsed = parts;
+            this.partsUsed = parts;
+        }
     }
 
     public List<Long> getPartsUsed() {

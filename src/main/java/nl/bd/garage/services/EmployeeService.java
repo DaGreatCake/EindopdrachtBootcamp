@@ -4,6 +4,7 @@ import nl.bd.garage.models.entities.Employee;
 import nl.bd.garage.models.enums.Role;
 import nl.bd.garage.models.exceptions.ModifyAdminException;
 import nl.bd.garage.models.exceptions.EmployeeNotFoundException;
+import nl.bd.garage.models.exceptions.UsernameAlreadyExistsException;
 import nl.bd.garage.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,13 +38,20 @@ public class EmployeeService {
         return employeeRepository.findById(employeeId).orElseThrow(() -> new EmployeeNotFoundException(employeeId));
     }
 
+    // Returns a list of customers by name.
+    public List<Employee> getEmployeesByName(String name) {
+        return employeeRepository.findCustomersByName(name);
+    }
+
     /*
      * Creates new employee in the database.
      *
      * Will throw exception if the new role is ADMIN.
      */
     public Employee createEmployee(Employee newEmployee) {
-        if (newEmployee.getRole() == Role.ADMIN) {
+        if (employeeRepository.findByUsername(newEmployee.getUsername()) != null) {
+            throw new UsernameAlreadyExistsException(newEmployee.getUsername());
+        } else if (newEmployee.getRole() == Role.ADMIN) {
             throw new ModifyAdminException("create");
         } else {
             newEmployee.setPassword(passwordEncoder.encode(newEmployee.getPassword()));
@@ -57,15 +65,30 @@ public class EmployeeService {
      * Will throw exception if the new role is ADMIN or the employee id doesnt exist.
      */
     public Employee updateEmployee(Employee newEmployee, Long employeeId) {
-        if (newEmployee.getRole() == Role.ADMIN) {
-            throw new ModifyAdminException("create");
+        if (employeeRepository.findByUsername(newEmployee.getUsername()) != null) {
+            throw new UsernameAlreadyExistsException(newEmployee.getUsername());
         } else {
             return employeeRepository.findById(employeeId)
                     .map(employee -> {
-                        employee.setUsername(newEmployee.getUsername());
-                        employee.setPassword(passwordEncoder.encode(newEmployee.getPassword()));
-                        employee.setName(newEmployee.getName());
-                        employee.setRole(newEmployee.getRole());
+                        if (employee.getRole() != Role.ADMIN && newEmployee.getRole() == Role.ADMIN) {
+                            throw new ModifyAdminException("create");
+                        } else if (employee.getRole() == Role.ADMIN && newEmployee.getRole() != Role.ADMIN) {
+                            throw new ModifyAdminException("delete");
+                        }
+
+                        if (newEmployee.getUsername() != null) {
+                            employee.setUsername(newEmployee.getUsername());
+                        }
+                        if (newEmployee.getPassword() != null) {
+                            employee.setPassword(passwordEncoder.encode(newEmployee.getPassword()));
+                        }
+                        if (newEmployee.getName() != null) {
+                            employee.setName(newEmployee.getName());
+                        }
+                        if (newEmployee.getRole() != null) {
+                            employee.setRole(newEmployee.getRole());
+                        }
+
                         return employeeRepository.save(employee);
                     })
                     .orElseThrow(() -> new EmployeeNotFoundException(employeeId));

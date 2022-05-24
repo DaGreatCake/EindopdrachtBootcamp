@@ -14,8 +14,8 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
             CustomerDisagreedException.class, CustomerDisagreedException.class, CustomerNotFoundException.class,
             EmployeeNotFoundException.class, FileNotFoundException.class, IncorrectSyntaxException.class,
             ModifyAdminException.class, PartOutOfStockException.class, PreviousStepUncompletedException.class,
-            RepairNotFoundException.class})
+            RepairNotFoundException.class, UsernameAlreadyExistsException.class})
     public ResponseEntity<Object> handlePublicException(Exception ex, WebRequest request) {
-        return new ResponseEntity<>(ex.getLocalizedMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(ex.getLocalizedMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 }

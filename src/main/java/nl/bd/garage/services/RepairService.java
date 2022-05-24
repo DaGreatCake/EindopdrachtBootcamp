@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.List;
 
 /*
@@ -150,7 +151,7 @@ public class RepairService {
      * Will throw exception if repair id doesnt exist or if the string is empty.
      */
     public Repair setFoundProblems(String foundProblems, Long repairId) {
-        if (foundProblems.equals("")) {
+        if (foundProblems == null) {
             throw new IncorrectSyntaxException("foundProblems");
         }
 
@@ -170,7 +171,7 @@ public class RepairService {
     public Repair setCanceled(Long repairId) {
         return repairRepository.findById(repairId)
                 .map(repair -> {
-                    if (repair.getFoundProblems().equals("")) {
+                    if (repair.getFoundProblems() == null) {
                         throw new PreviousStepUncompletedException("set found problems");
                     }
 
@@ -194,7 +195,7 @@ public class RepairService {
 
         return repairRepository.findById(repairId)
                 .map(repair -> {
-                    if (repair.getFoundProblems().equals("")) {
+                    if (repair.getFoundProblems() == null) {
                         throw new PreviousStepUncompletedException("set found problems");
                     } else if (repair.getCustomerAgreed() != null) {
                         if (!repair.getCustomerAgreed()) {
@@ -222,13 +223,16 @@ public class RepairService {
         }
 
         List<Long> partsList = repairSetPartsRequest.getPartsUsed();
-        for (Long l : partsList) {
-            if (costItemRepository.findById(l).isEmpty()) {
-                throw new CostItemNotFoundException(l);
-            } else if (costItemRepository.findById(l).get().getCostType() == CostType.PART &&
-                    costItemRepository.findById(l).get().getStock() <= 0) {
-                throw new PartOutOfStockException(l);
-            }
+        for (Long costItemId : partsList) {
+            costItemRepository.findById(costItemId).map(costItem -> {
+                if (costItem.getCostType() == CostType.PART && costItem.getStock() <= 0) {
+                    throw new PartOutOfStockException(costItemId);
+                } else if (costItem.getCostType() == CostType.PART) {
+                    costItem.setStock(costItem.getStock() - 1);
+                }
+
+                return costItemRepository.save(costItem);
+            }).orElseThrow(() -> new CostItemNotFoundException(costItemId));
         }
 
         if (partsList.isEmpty()) {
@@ -307,36 +311,40 @@ public class RepairService {
         } else {
             throw new RepairNotFoundException(repairId);
         }
-        if (!repair.getCalled()) {
-            throw new PreviousStepUncompletedException("call customer");
-        }
 
         if (repair.getCustomerAgreed()) {
             List<CostItem> costItems = costItemRepository.findCostItemsByIdList(repair.getPartsUsed());
 
             if (costItems.get(0).getCostItemId() != -1) {
-                receipt += "\n\nParts used: \n";
+                Collections.sort(costItems);
+                boolean anyPart = false, anyAction = false;
 
                 for (CostItem costItem : costItems) {
                     if (costItem.getCostType() == CostType.PART) {
-                        receipt += costItem.getName() + " : €" + costItem.getCost()
-                                + ", VAT: €" + (costItem.getCost() * TAX_PERCENTAGE) + "\n";
-                        total += costItem.getCost();
-                    }
-                }
+                        if (!anyPart) {
+                            receipt += "\n\nParts used: \n";
+                        }
 
-                receipt += "\nActions done: \n";
-                for (CostItem costItem : costItems) {
-                    if (costItem.getCostType() == CostType.ACTION) {
-                        receipt += costItem.getName() + " : €" + costItem.getCost()
-                                + ", VAT: €" + (costItem.getCost() * TAX_PERCENTAGE) + "\n";
-                        total += costItem.getCost();
+                        anyPart = true;
+                    } else {
+                        if (!anyAction) {
+                            receipt += "\nActions done: \n";
+                        }
+
+                        anyAction = true;
                     }
+
+                    receipt += costItem.getName() + " : €" + costItem.getCost()
+                            + ", VAT: €" + (costItem.getCost() * TAX_PERCENTAGE) + "\n";
+                    total += costItem.getCost();
                 }
             }
 
-            receipt += "\nOther actions : €" + repair.getOtherActionsPrice()
-                    + ", VAT: €" + (repair.getOtherActionsPrice() * TAX_PERCENTAGE) + "\n";
+            if (repair.getOtherActionsPrice() != 0) {
+                receipt += "\nOther actions : €" + repair.getOtherActionsPrice()
+                        + ", VAT: €" + (repair.getOtherActionsPrice() * TAX_PERCENTAGE) + "\n";
+            }
+
             total += repair.getOtherActionsPrice();
         }
 
@@ -373,9 +381,10 @@ public class RepairService {
      */
     public void deleteRepair(Long repairId) {
         if (repairRepository.findById(repairId).isPresent()) {
-            if (fileRepository.findById(repairRepository.findById(repairId).get().getFile().getFileId()).isPresent()) {
+            if (repairRepository.findById(repairId).get().getFile() != null) {
                 fileRepository.deleteById(repairRepository.findById(repairId).get().getFile().getFileId());
             }
+
             repairRepository.deleteById(repairId);
         } else {
             throw new RepairNotFoundException(repairId);
