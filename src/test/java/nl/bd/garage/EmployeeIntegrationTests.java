@@ -117,14 +117,16 @@ public class EmployeeIntegrationTests {
     }
 
     @Test
-    public void updateEmployeeAndGetByIdTest() throws Exception {
+    public void updateEmployeeAndEditAdminTest() throws Exception {
         //Arrange
         List<Employee> employees = initEmployees();
         Employee employee1 = employees.get(0);
         Employee employee2 = employees.get(3);
+        Employee employee3 = employees.get(4);
 
         String jsonBodyEmployee1 = objectMapper.writeValueAsString(employee1);
         String jsonBodyEmployee2 = objectMapper.writeValueAsString(employee2);
+        String jsonBodyEmployee3 = objectMapper.writeValueAsString(employee3);
 
         //Act
         this.mockMvc.perform(post("/api/employees").contentType(APPLICATION_JSON_UTF8).content(jsonBodyEmployee1))
@@ -151,6 +153,11 @@ public class EmployeeIntegrationTests {
                 .andExpect(jsonPath("$.[0].employeeId").value(first.getEmployeeId()))
                 .andExpect(jsonPath("$.[0].username").value(employee2.getUsername()))
                 .andExpect(status().isOk());
+
+        this.mockMvc.perform(put("/api/employees/" + first.getEmployeeId())
+                .contentType(APPLICATION_JSON_UTF8).content(jsonBodyEmployee3))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -187,12 +194,15 @@ public class EmployeeIntegrationTests {
         Employee employee3 = new Employee("ben03", "pass3", "Jip Sterk", Role.CASHIER);
         Employee employee4 = new Employee();
         employee4.setUsername("benupdated");
+        Employee employee5 = new Employee();
+        employee5.setRole(Role.ADMIN);
 
         List<Employee> employees = new ArrayList<Employee>();
         employees.add(employee1);
         employees.add(employee2);
         employees.add(employee3);
         employees.add(employee4);
+        employees.add(employee5);
 
         return employees;
     }

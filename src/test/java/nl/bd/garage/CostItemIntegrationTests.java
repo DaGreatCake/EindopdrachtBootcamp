@@ -74,27 +74,34 @@ public class CostItemIntegrationTests {
     }
 
     @Test
-    public void addStockTest() throws Exception {
+    public void addStockAndAddStockExceptionTest() throws Exception {
         //Arrange
-        CostItemRegistrationRequest costItem = initCostItems().get(0);
+        CostItemRegistrationRequest costItem1 = initCostItems().get(0);
+        CostItemRegistrationRequest costItem2 = initCostItems().get(1);
         AddStockRequest addStockRequest = new AddStockRequest(7);
 
-        String jsonBodyCostItem = objectMapper.writeValueAsString(costItem);
+        String jsonBodyCostItem1 = objectMapper.writeValueAsString(costItem1);
+        String jsonBodyCostItem2 = objectMapper.writeValueAsString(costItem2);
         String jsonBodyAddStock = objectMapper.writeValueAsString(addStockRequest);
 
         //Act
-        this.mockMvc.perform(post("/api/costitems").contentType(APPLICATION_JSON_UTF8).content(jsonBodyCostItem))
+        this.mockMvc.perform(post("/api/costitems").contentType(APPLICATION_JSON_UTF8).content(jsonBodyCostItem1))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        this.mockMvc.perform(post("/api/costitems").contentType(APPLICATION_JSON_UTF8).content(jsonBodyCostItem2))
                 .andDo(print())
                 .andExpect(status().isOk());
 
         String jsonResult = this.mockMvc.perform(get("/api/costitems"))
                 .andDo(print())
-                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
         List<CostItem> costItemListResponse = objectMapper.readValue(jsonResult, new TypeReference<List<CostItem>>() {});
         CostItem first = costItemListResponse.get(0);
+        CostItem second = costItemListResponse.get(1);
 
         this.mockMvc.perform(put("/api/costitems/addstock/" + first.getCostItemId())
                 .contentType(APPLICATION_JSON_UTF8).content(jsonBodyAddStock));
@@ -105,9 +112,14 @@ public class CostItemIntegrationTests {
         //Assert
         this.mockMvc.perform(get("/api/costitems/"))
                 .andDo(print())
-                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$.[0].stock").value(addStockRequest.getAmount() * 2))
                 .andExpect(status().isOk());
+
+        this.mockMvc.perform(put("/api/costitems/addstock/" + second.getCostItemId())
+                .contentType(APPLICATION_JSON_UTF8).content(jsonBodyAddStock))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
